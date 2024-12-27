@@ -6,7 +6,7 @@ metadata:
 spec:
   storageClassName: manual
   capacity:
-    storage: 2Gi
+    storage: 5Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
@@ -22,7 +22,7 @@ spec:
   storageClassName: manual
   resources:
     requests:
-      storage: 2Gi
+      storage: 5Gi
   volumeName: pv-database
 
 ---
