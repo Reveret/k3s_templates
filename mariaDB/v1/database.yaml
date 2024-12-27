@@ -56,17 +56,10 @@ spec:
           #  - --character-set-server=utf8mb4
           #  - --collation-server=utf8mb4_general_ci
           #  - --general-log=9
+          envFrom:
+            - configMapRef:
+            	name: config-database
           env:
-            - name: TZ
-              valueFrom:
-                configMapKeyRef:
-                  name: config-backend
-                  key: TZ
-            - name: MYSQL_INITDB_SKIP_TZINFO
-              valueFrom:
-                configMapKeyRef:
-                  name: config-backend
-                  key: MYSQL_INITDB_SKIP_TZINFO
             - name: MARIADB_DATABASE
               valueFrom:
                 configMapKeyRef:
