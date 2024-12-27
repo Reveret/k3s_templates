@@ -1,6 +1,3 @@
 resources:
   - database.yaml
   - configMap.yaml
-
-nameSuffix: SHRECK
-namePrefix: PUPS
