@@ -1,5 +1,4 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+
 
 resources:
   - database.yaml
@@ -13,7 +12,3 @@ configMapGenerator:
       - TZ=Europe/Berlin
       - MYSQL_INITDB_SKIP_TZINFO=1
    
-nameReference:
-  - kind: ConfigMap
-    fieldSpecs:
-      - path: spec.template.spec.containers[0].envFrom[0].configMapRef.name
