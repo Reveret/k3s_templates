@@ -1,6 +1,9 @@
 resources:
   - database.yaml
 
+nameSuffix: -XXXXXXX
+namePrefix: XXXXXXX-
+
 configMapGenerator:
   - name: config-database
     literals:
