@@ -1,4 +1,6 @@
 resources:
   - database.yaml
   - configMap.yaml
-   
+
+nameSuffix: 
+namePrefix: 
