@@ -1,9 +1,9 @@
 resources:
   - database.yaml
 
-
 configMapGenerator:
-  - literals:
-    - TZ=Europe/Berlin
-    - MYSQL_INITDB_SKIP_TZINFO=1
-    name: config-database
+  - name: config-database
+    literals:
+      - TZ=Europe/Berlin
+      - MYSQL_INITDB_SKIP_TZINFO=1
+   
