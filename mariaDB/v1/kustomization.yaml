@@ -1,14 +1,4 @@
-
-
 resources:
   - database.yaml
-
-nameSuffix: -XXXXXXX
-namePrefix: XXXXXXX-
-
-configMapGenerator:
-  - name: config-database
-    literals:
-      - TZ=Europe/Berlin
-      - MYSQL_INITDB_SKIP_TZINFO=1
+  - configMap.yaml
    
