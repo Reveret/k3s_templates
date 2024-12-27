@@ -62,9 +62,9 @@ spec:
           env:
             - name: MARIADB_DATABASE
               valueFrom:
-                configMapKeyRef:
-                  name: config-backend
+                secretKeyRef:
                   key: MARIADB_DATABASE
+                  name: secrets
             - name: MARIADB_PASSWORD
               valueFrom:
                 secretKeyRef:
