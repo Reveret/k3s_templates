@@ -63,7 +63,7 @@ spec:
                     --all-databases \
                     --single-transaction \
                     --quick \
-                    -h svc-database TODOOOOOOOOOOOOOOO \
+                    -h "$MARIADB_HOSTNAME" \
                     -u"$MARIADB_USER" \
                     -p"$MARIADB_PASSWORD" \
                   | gzip > "$BACKUP_FILE"
