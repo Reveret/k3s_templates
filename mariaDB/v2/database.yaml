@@ -1,0 +1,107 @@
+#---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: config-database
+#data:
+#  TZ: "Europe/Berlin"
+#  MYSQL_INITDB_SKIP_TZINFO: "1"
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-database
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /var/lib/containers/storage/volumes/database  # storage path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: pv-database
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deploy-database
+  template:
+    metadata:
+      labels:
+        app: deploy-database
+    spec:
+      containers:
+        - name: container-database
+          image: mariadb
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: volume-database
+              mountPath: /var/lib/mysql
+          #args:
+          #  - --transaction-isolation=READ-COMMITTED
+          #  - --binlog-format=ROW
+          #  - --log-bin=binlog
+          #  - --max-connections=1000
+          #  - --character-set-server=utf8mb4
+          #  - --collation-server=utf8mb4_general_ci
+          #  - --general-log=9
+          envFrom:
+            - configMapRef:
+                name: config-database
+          env:
+            - name: MARIADB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: MARIADB_DATABASE
+                  name: secrets
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MARIADB_PASSWORD
+                  name: secrets
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MARIADB_ROOT_PASSWORD
+                  name: secrets
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  key: MARIADB_USER
+                  name: secrets
+      volumes:
+        - name: volume-database
+          persistentVolumeClaim:
+            claimName: pvc-database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-database
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+  selector:
+    app: deploy-database

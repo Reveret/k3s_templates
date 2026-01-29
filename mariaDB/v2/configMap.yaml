@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-database
+data:
+  TZ: Europe/Berlin
+  MYSQL_INITDB_SKIP_TZINFO: "1"

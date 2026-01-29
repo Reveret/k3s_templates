@@ -1,0 +1,106 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-db-backup
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /var/lib/containers/storage/volumes/db-backup  # storage path
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-db-backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: pv-db-backup
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-db-backup
+spec:
+  schedule: "30 2 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: mariadb
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -e
+                  
+                  # Create backup directory if it doesn't exist
+                  mkdir -p /backup/rolingBackups
+                  
+                  DATE=$(date +%F)
+                  BACKUP_FILE="/backup/rolingBackups/db-${DATE}.sql.gz"
+                  LAST_LINK="/backup/db-latest.sql.gz"
+                  
+                  echo "Starting MariaDB backup at $(date)"
+                  
+                  mariadb-dump \
+                    --all-databases \
+                    --single-transaction \
+                    --quick \
+                    -h svc-database TODOOOOOOOOOOOOOOO \
+                    -u"$MARIADB_USER" \
+                    -p"$MARIADB_PASSWORD" \
+                  | gzip > "$BACKUP_FILE"
+                  
+                  echo "Backup finished: $BACKUP_FILE"
+                  
+                  # Optional integrity check
+                  gzip -t "$BACKUP_FILE"
+                  
+                  echo "Running rotation (keep 7 days)"
+                  find /backup/rolingBackups -type f -name "db-*.sql.gz" -mtime +7 -delete
+                  
+                  # Aktualisieren des Symlinks auf das neueste Backup
+                  ln -sf "$BACKUP_FILE" "$LAST_LINK"
+                  echo "Updated latest symlink: $LAST_LINK -> $BACKUP_FILE"
+                  
+                  echo "Backup job completed successfully at $(date)"
+              env:
+                - name: MARIADB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      key: MARIADB_PASSWORD
+                      name: secrets
+                - name: MARIADB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      key: MARIADB_USER
+                      name: secrets
+                - name: MARIADB_HOSTNAME
+                  valueFrom:
+                    secretKeyRef:
+                      key: MARIADB_HOSTNAME
+                      name: secrets
+              volumeMounts:
+                - name: backup-volume
+                  mountPath: /backup
+          volumes:
+            - name: backup-volume
+              persistentVolumeClaim:
+                claimName: pvc-db-backup

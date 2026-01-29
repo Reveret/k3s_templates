@@ -1,0 +1,4 @@
+resources:
+  - database.yaml
+  - configMap.yaml
+  - cron_db_backup.yaml
