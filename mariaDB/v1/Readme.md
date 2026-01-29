@@ -1,5 +1,5 @@
 
-1. Im `k3s/baase/kustomization.yaml` muss folgendes hinzugefügt werden:
+1. Im `k3s/base/kustomization.yaml` muss folgendes hinzugefügt werden:
 ```text
 resources:
   - https://github.com/Reveret/k3s_templates.git//mariaDB/v1?ref=main
@@ -15,7 +15,7 @@ kubectl create secret generic secrets \
   --from-literal=MARIADB_ROOT_PASSWORD=***DATABASE_ROOT_PASSWORD***
   ```
 
-3. Es muss ein k3s/overlay/prod/database.yaml angelegt werden mit dem Inhalt (das ***SERVICE_NAME*** ersetzen):
+3. Es muss ein `k3s/overlay/prod/database.yaml` angelegt werden mit dem Inhalt (das ***SERVICE_NAME*** ersetzen):
 ```text
 ---
 apiVersion: v1
@@ -27,13 +27,13 @@ spec:
     path: /raid5_4TB/k3s/volumes/***SERVICE_NAME***/database
 ```
 
-4. In k3s/overlay/prod/kustomization.yaml muss folgendes hinzugefügt werden:
+4. In `k3s/overlay/prod/kustomization.yaml` muss folgendes hinzugefügt werden:
 ```text
 patches:
   - path: database.yaml
 ```
 
-5. (Optional) In k3s/overlay/prod/kustomization.yaml kann die image-Version gestezt werden:
+5. (Optional) In `k3s/overlay/prod/kustomization.yaml` kann die image-Version gestezt werden:
 ```text
 images:
   - name: mariadb
