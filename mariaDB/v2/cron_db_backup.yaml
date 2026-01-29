@@ -51,10 +51,10 @@ spec:
                   set -e
                   
                   # Create backup directory if it doesn't exist
-                  mkdir -p /backup/rollingbackups
+                  mkdir -p /backup/rollingBackups
                   
                   DATE=$(date +%F)
-                  BACKUP_FILE="/backup/rollingbackups/db-${DATE}.sql.gz"
+                  BACKUP_FILE="/backup/rollingBackups/db-${DATE}.sql.gz"
                   LAST_LINK="/backup/db-latest.sql.gz"
                   
                   echo "Starting MariaDB backup at $(date)"
@@ -74,7 +74,7 @@ spec:
                   gzip -t "$BACKUP_FILE"
                   
                   echo "Running rotation (keep 7 days)"
-                  find /backup/rollingbackups -type f -name "db-*.sql.gz" -mtime +7 -delete
+                  find /backup/rollingBackups -type f -name "db-*.sql.gz" -mtime +7 -delete
                   
                   # Aktualisieren des Symlinks auf das neueste Backup
                   cp "$BACKUP_FILE" "$LAST_LINK"
