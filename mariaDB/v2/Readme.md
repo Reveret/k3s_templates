@@ -1,10 +1,4 @@
-1. Im `k3s/baase/kustomization.yaml` muss folgendes hinzugefügt werden:
-```text
-resources:
-  - https://github.com/Reveret/k3s_templates.git//mariaDB/v1?ref=main
-```
-
-2. Es muss ein Secret im Namespace hinterlegt sein. Das aknn so erzeugt werden (die ***EXAMPLE*** ersetzen):
+1. Es muss ein Secret im Namespace hinterlegt sein. Das aknn so erzeugt werden (die ***EXAMPLE*** ersetzen):
 ```bash
 kubectl create secret generic secrets \
   --namespace=***NAMESPACE*** \
@@ -15,7 +9,7 @@ kubectl create secret generic secrets \
   --from-literal=MARIADB_HOSTNAME=***SUFFIX-svc-database-POSTFIX***
   ```
 
-3. Es muss ein `k3s/overlay/prod/database.yaml` angelegt werden mit dem Inhalt (das ***SERVICE_NAME*** ersetzen):
+2. Es muss ein `k3s/overlay/prod/database.yaml` angelegt werden mit dem Inhalt (das ***SERVICE_NAME*** ersetzen):
 ```text
 ---
 apiVersion: v1
@@ -36,8 +30,11 @@ spec:
     path: /raid5_4TB/k3s/volumes/***SERVICE_NAME***/db-backup
 ```
 
-4. Im `k3s/overlay/prod/kustomization.yaml` muss folgendes hinzugefügt werden:
+3. Im `k3s/overlay/prod/kustomization.yaml` muss folgendes hinzugefügt werden:
 ```text
+resources:
+  - https://github.com/Reveret/k3s_templates.git//mariaDB/v1?ref=main
+  
 patches:
   - path: database.yaml
 ```
