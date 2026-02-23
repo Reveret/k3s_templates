@@ -41,7 +41,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
-          containers: 
+          containers:
             - name: backup
               image: mariadb
               imagePullPolicy: IfNotPresent
