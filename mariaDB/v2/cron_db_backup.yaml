@@ -36,11 +36,12 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 300 # 5 mins
       backoffLimit: 2
       template:
         spec:
           restartPolicy: OnFailure
-          containers:
+          containers: 
             - name: backup
               image: mariadb
               imagePullPolicy: IfNotPresent
@@ -67,6 +68,13 @@ spec:
                     -u"$MARIADB_USER" \
                     -p"$MARIADB_PASSWORD" \
                   | gzip > "$BACKUP_FILE"
+                  rc=$?  # return code
+
+                  if [[ $rc -ne 0 ]] ; then
+                    echo "Failed with error-code $rc"
+                    rm "$BACKUP_FILE"
+                    exit $rc
+                  fi
                   
                   echo "Backup finished: $BACKUP_FILE"
                   
