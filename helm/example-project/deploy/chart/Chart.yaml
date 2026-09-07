@@ -6,22 +6,22 @@ version: 0.1.0
 appVersion: "1.0.0"
 dependencies:
   - name: app
-    version: 0.1.0
-    repository: file://../../../public-helm-charts/charts/app
+    version: 0.2.0
+    repository: https://reveret.github.io/k3s_templates
     alias: frontend
     condition: frontend.enabled
   - name: app
-    version: 0.1.0
-    repository: file://../../../public-helm-charts/charts/app
+    version: 0.2.0
+    repository: https://reveret.github.io/k3s_templates
     alias: backend
     condition: backend.enabled
   - name: database-with-backup
     version: 0.1.0
-    repository: file://../../../public-helm-charts/charts/database-with-backup
+    repository: https://reveret.github.io/k3s_templates
     alias: database
     condition: database.enabled
   - name: ingress-routes
     version: 0.1.0
-    repository: file://../../../public-helm-charts/charts/ingress-routes
+    repository: https://reveret.github.io/k3s_templates
     alias: ingress
     condition: ingress.enabled
