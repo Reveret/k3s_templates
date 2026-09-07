@@ -1,0 +1,59 @@
+frontend:
+  image:
+    tag: dev
+  configMap:
+    data:
+      PRODUCTION: "false"
+      WEBSOCKET_URL: "wss://dev.app.example.com/ws"
+      API_URL: "https://dev.app.example.com/api"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+backend:
+  image:
+    tag: dev
+  configMap:
+    data:
+      ALLOWED_HOSTS: "dev.app.example.com"
+      DB_URL: "jdbc:mariadb://example-database:3306/kk1_dev"
+      PRODUCTION: "false"
+      APP_PORT: "8080"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 384Mi
+
+database:
+  database:
+    name: kk1_dev
+  persistence:
+    size: 5Gi
+  backup:
+    schedule: "0 5 * * *"
+
+ingress:
+  tls:
+    - hosts:
+        - dev.app.example.com
+      secretName: cert-example-app-dev
+  rules:
+    - host: dev.app.example.com
+      paths:
+        - path: /
+          pathType: Exact
+          service:
+            name: example-frontend
+            port: 80
+        - path: /api
+          pathType: Prefix
+          service:
+            name: example-backend
+            port: 80

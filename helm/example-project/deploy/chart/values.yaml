@@ -1,0 +1,110 @@
+frontend:
+  enabled: true
+  fullnameOverride: example-frontend
+  image:
+    repository: ghcr.io/reveret/kk1-webapp-frontend
+    tag: latest
+  imagePullSecrets:
+    - name: ghcr-login-secret
+  service:
+    port: 80
+    targetPort: http
+  containerPorts:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+  configMap:
+    create: true
+    injectAsEnvFrom: true
+    data:
+      PRODUCTION: "true"
+      WEBSOCKET_URL: "wss://app.example.com/ws"
+      API_URL: "https://app.example.com/api"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+backend:
+  enabled: true
+  fullnameOverride: example-backend
+  image:
+    repository: ghcr.io/reveret/kk1-webapp-backend
+    tag: latest
+  imagePullSecrets:
+    - name: ghcr-login-secret
+  service:
+    port: 80
+    targetPort: http
+  containerPorts:
+    - name: http
+      containerPort: 8080
+      protocol: TCP
+  configMap:
+    create: true
+    injectAsEnvFrom: true
+    data:
+      ALLOWED_HOSTS: "app.example.com"
+      DB_URL: "jdbc:mariadb://example-database:3306/kk1"
+      PRODUCTION: "true"
+      APP_PORT: "8080"
+  env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: MARIADB_PASSWORD
+    - name: DB_USER
+      valueFrom:
+        secretKeyRef:
+          name: app-secrets
+          key: MARIADB_USER
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+database:
+  enabled: true
+  fullnameOverride: example-database
+  auth:
+    existingSecret: app-secrets
+  database:
+    name: kk1
+  persistence:
+    size: 20Gi
+    storageClassName: manual
+  backup:
+    schedule: "0 3 * * *"
+    retentionDays: 7
+
+ingress:
+  enabled: true
+  fullnameOverride: example-ingress
+  ingressClassName: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: clusterissuer-ionos-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: cert-example-app
+  rules:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Exact
+          service:
+            name: example-frontend
+            port: 80
+        - path: /api
+          pathType: Prefix
+          service:
+            name: example-backend
+            port: 80

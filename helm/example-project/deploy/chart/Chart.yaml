@@ -1,0 +1,27 @@
+apiVersion: v2
+name: example-stack
+description: Example umbrella chart composing reusable public charts.
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+dependencies:
+  - name: app
+    version: 0.1.0
+    repository: file://../../../public-helm-charts/charts/app
+    alias: frontend
+    condition: frontend.enabled
+  - name: app
+    version: 0.1.0
+    repository: file://../../../public-helm-charts/charts/app
+    alias: backend
+    condition: backend.enabled
+  - name: database-with-backup
+    version: 0.1.0
+    repository: file://../../../public-helm-charts/charts/database-with-backup
+    alias: database
+    condition: database.enabled
+  - name: ingress-routes
+    version: 0.1.0
+    repository: file://../../../public-helm-charts/charts/ingress-routes
+    alias: ingress
+    condition: ingress.enabled

@@ -1,0 +1,55 @@
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: mariadb
+  tag: "11.4"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+service:
+  type: ClusterIP
+  port: 3306
+
+config:
+  create: true
+  data:
+    TZ: Europe/Berlin
+    MYSQL_INITDB_SKIP_TZINFO: "1"
+
+database:
+  name: app
+
+auth:
+  existingSecret: ""
+  rootPassword: change-me-root
+  username: app
+  password: change-me-user
+
+persistence:
+  enabled: true
+  existingClaim: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 20Gi
+  storageClassName: ""
+  dataMountPath: /var/lib/mysql
+  backupSubPath: backups
+
+resources: {}
+
+backup:
+  enabled: true
+  schedule: "0 3 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  image:
+    repository: mariadb
+    tag: "11.4"
+    pullPolicy: IfNotPresent
+  outputDir: /backup
+  retentionDays: 7

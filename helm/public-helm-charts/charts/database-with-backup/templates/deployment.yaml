@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "database-with-backup.fullname" . }}
+  labels:
+    {{- include "database-with-backup.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "database-with-backup.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "database-with-backup.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: mariadb
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: mysql
+              containerPort: 3306
+              protocol: TCP
+          env:
+            - name: MARIADB_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database-with-backup.secretName" . }}
+                  key: MARIADB_DATABASE
+            - name: MARIADB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database-with-backup.secretName" . }}
+                  key: MARIADB_USER
+            - name: MARIADB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database-with-backup.secretName" . }}
+                  key: MARIADB_PASSWORD
+            - name: MARIADB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "database-with-backup.secretName" . }}
+                  key: MARIADB_ROOT_PASSWORD
+          {{- if and .Values.config.create .Values.config.data }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "database-with-backup.configMapName" . }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.persistence.dataMountPath }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "database-with-backup.pvcName" . }}

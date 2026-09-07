@@ -1,0 +1,52 @@
+frontend:
+  replicaCount: 2
+  image:
+    tag: stable
+  resources:
+    requests:
+      cpu: 150m
+      memory: 192Mi
+    limits:
+      cpu: 750m
+      memory: 768Mi
+
+backend:
+  replicaCount: 2
+  image:
+    tag: stable
+  configMap:
+    data:
+      DB_URL: "jdbc:mariadb://example-database:3306/kk1"
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+database:
+  persistence:
+    size: 50Gi
+  backup:
+    schedule: "0 2 * * *"
+    retentionDays: 14
+
+ingress:
+  tls:
+    - hosts:
+        - app.example.com
+      secretName: cert-example-app
+  rules:
+    - host: app.example.com
+      paths:
+        - path: /
+          pathType: Exact
+          service:
+            name: example-frontend
+            port: 80
+        - path: /api
+          pathType: Prefix
+          service:
+            name: example-backend
+            port: 80

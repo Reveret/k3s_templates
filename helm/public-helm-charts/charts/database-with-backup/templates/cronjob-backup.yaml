@@ -1,0 +1,68 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "database-with-backup.fullname" . }}-backup
+  labels:
+    {{- include "database-with-backup.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: {{ .Values.backup.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.backup.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.backup.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            {{- include "database-with-backup.selectorLabels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: backup
+              image: "{{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}"
+              imagePullPolicy: {{ .Values.backup.image.pullPolicy }}
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
+                  mkdir -p {{ .Values.backup.outputDir | quote }}
+                  mariadb-dump \
+                    --host={{ include "database-with-backup.fullname" . }} \
+                    --user="$MARIADB_USER" \
+                    --password="$MARIADB_PASSWORD" \
+                    "$MARIADB_DATABASE" \
+                    > "{{ .Values.backup.outputDir }}/{{ include "database-with-backup.fullname" . }}-${TIMESTAMP}.sql"
+                  find {{ .Values.backup.outputDir | quote }} -type f -name '*.sql' -mtime +{{ .Values.backup.retentionDays }} -delete
+              env:
+                - name: MARIADB_DATABASE
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "database-with-backup.secretName" . }}
+                      key: MARIADB_DATABASE
+                - name: MARIADB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "database-with-backup.secretName" . }}
+                      key: MARIADB_USER
+                - name: MARIADB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "database-with-backup.secretName" . }}
+                      key: MARIADB_PASSWORD
+              volumeMounts:
+                - name: data
+                  mountPath: {{ .Values.backup.outputDir }}
+                  {{- with .Values.persistence.backupSubPath }}
+                  subPath: {{ . }}
+                  {{- end }}
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: {{ include "database-with-backup.pvcName" . }}
+{{- end }}
