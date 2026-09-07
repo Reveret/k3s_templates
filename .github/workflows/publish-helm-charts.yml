@@ -26,6 +26,16 @@ jobs:
           git config user.name "${GITHUB_ACTOR}"
           git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
+      - name: Initialize GitHub Pages branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git ls-remote --exit-code --heads origin gh-pages >/dev/null 2>&1; then
+            git branch gh-pages "${GITHUB_SHA}"
+            git push origin gh-pages
+          fi
+          git fetch origin gh-pages:refs/remotes/origin/gh-pages
+
       - name: Set up Helm
         uses: azure/setup-helm@v4
 
