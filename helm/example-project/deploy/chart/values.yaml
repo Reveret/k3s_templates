@@ -3,16 +3,6 @@ frontend:
   fullnameOverride: example-frontend
   image:
     repository: ghcr.io/reveret/kk1-webapp-frontend
-    tag: latest
-  imagePullSecrets:
-    - name: ghcr-login-secret
-  service:
-    port: 80
-    targetPort: http
-  containerPorts:
-    - name: http
-      containerPort: 8080
-      protocol: TCP
   configMap:
     create: true
     injectAsEnvFrom: true
@@ -20,29 +10,11 @@ frontend:
       PRODUCTION: "true"
       WEBSOCKET_URL: "wss://app.example.com/ws"
       API_URL: "https://app.example.com/api"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-
 backend:
   enabled: true
   fullnameOverride: example-backend
   image:
     repository: ghcr.io/reveret/kk1-webapp-backend
-    tag: latest
-  imagePullSecrets:
-    - name: ghcr-login-secret
-  service:
-    port: 80
-    targetPort: http
-  containerPorts:
-    - name: http
-      containerPort: 8080
-      protocol: TCP
   configMap:
     create: true
     injectAsEnvFrom: true
@@ -62,13 +34,6 @@ backend:
         secretKeyRef:
           name: app-secrets
           key: MARIADB_USER
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
 
 database:
   enabled: true
@@ -77,17 +42,10 @@ database:
     existingSecret: app-secrets
   database:
     name: kk1
-  persistence:
-    size: 20Gi
-    storageClassName: manual
-  backup:
-    schedule: "0 3 * * *"
-    retentionDays: 7
 
 ingress:
   enabled: true
   fullnameOverride: example-ingress
-  ingressClassName: nginx
   annotations:
     cert-manager.io/cluster-issuer: clusterissuer-ionos-prod
     nginx.ingress.kubernetes.io/ssl-redirect: "true"

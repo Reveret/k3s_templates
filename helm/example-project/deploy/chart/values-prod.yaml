@@ -1,5 +1,5 @@
 frontend:
-  replicaCount: 2
+  replicaCount: 1
   image:
     tag: stable
   resources:
@@ -11,7 +11,7 @@ frontend:
       memory: 768Mi
 
 backend:
-  replicaCount: 2
+  replicaCount: 1
   image:
     tag: stable
   configMap:
