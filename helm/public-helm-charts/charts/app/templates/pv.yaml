@@ -1,0 +1,26 @@
+{{- if and .Values.persistence.enabled .Values.persistence.local.enabled (not .Values.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "app.pvName" . }}
+  labels:
+    {{- include "app.labels" . | nindent 4 }}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  volumeMode: Filesystem
+  accessModes:
+    {{- toYaml .Values.persistence.accessModes | nindent 4 }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  local:
+    path: {{ required "persistence.local.path is required when persistence.local.enabled is true" .Values.persistence.local.path }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - {{ required "persistence.local.nodeName is required when persistence.local.enabled is true" .Values.persistence.local.nodeName }}
+{{- end }}
