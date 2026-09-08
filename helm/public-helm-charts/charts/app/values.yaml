@@ -61,6 +61,11 @@ persistence:
     - ReadWriteOnce
   size: 10Gi
   storageClassName: ""
+  local:
+    enabled: false
+    path: ""
+    nodeName: ""
+    volumeName: ""
   annotations: {}
   mounts:
     - mountPath: /data

@@ -49,3 +49,23 @@ branch**, select `gh-pages`, and select the `/ (root)` folder.
 The chart repository contains templates and safe defaults only. Production
 values, domains, storage details, image credentials, and Kubernetes Secrets
 must remain in the consuming private repository or a secret manager.
+
+## Fixed local storage
+
+The `app` chart can optionally create a static local `PersistentVolume` and
+bind its PVC to a host path on a specific Kubernetes node:
+
+```yaml
+persistence:
+  enabled: true
+  size: 40Gi
+  local:
+    enabled: true
+    path: /raid5_4TB/k3s/volumes/fvtt
+    nodeName: k3s-server
+```
+
+The path must exist on that node. Local volumes are node-bound; they do not
+move automatically if the node becomes unavailable. The chart uses
+`persistentVolumeReclaimPolicy: Retain` to avoid deleting the data when the
+claim is removed.

@@ -58,3 +58,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- printf "%s-data" (include "app.fullname" .) -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "app.pvName" -}}
+{{- if .Values.persistence.local.volumeName -}}
+{{- .Values.persistence.local.volumeName -}}
+{{- else -}}
+{{- printf "%s-pv" (include "app.fullname" .) -}}
+{{- end -}}
+{{- end -}}
