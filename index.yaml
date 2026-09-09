@@ -3,6 +3,17 @@ entries:
   app:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-09-09T21:56:59.674807879Z"
+    description: Reusable application chart for a single workload with optional service,
+      ingress, and persistence.
+    digest: 0c3913660ea9416fb6304f1d3bfc9980a7e853bcef5c9f80260677dfb8fb3ec6
+    name: app
+    type: application
+    urls:
+    - https://github.com/Reveret/k3s_templates/releases/download/app-0.5.0/app-0.5.0.tgz
+    version: 0.5.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-09-08T21:24:07.141346834Z"
     description: Reusable application chart for a single workload with optional service,
       ingress, and persistence.
@@ -56,4 +67,4 @@ entries:
     urls:
     - https://github.com/Reveret/k3s_templates/releases/download/ingress-routes-0.1.0/ingress-routes-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-08T21:24:07.14135803Z"
+generated: "2026-09-09T21:56:59.674825774Z"
