@@ -25,6 +25,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
+      hostNetwork: {{ .Values.hostNetwork }}
+      dnsPolicy: {{ .Values.dnsPolicy }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ include "app.serviceAccountName" . }}
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -34,6 +40,10 @@ spec:
         - name: {{ include "app.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           stdin: {{ .Values.stdin }}
           tty: {{ .Values.tty }}
           ports:
