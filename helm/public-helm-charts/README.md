@@ -8,6 +8,11 @@ This folder contains the reusable Helm charts published by this repository.
 - `database-with-backup`: MariaDB plus persistent storage and a backup cronjob
 - `ingress-routes`: shared ingress chart that can route one host to multiple existing services
 
+The `app` chart supports custom container arguments (`args`) and multiple
+service ports (`service.ports`), including TCP and UDP ports on the same
+number. Example values for Minecraft and Terraria with TShock are in
+[`helm/examples`](../examples/README.md).
+
 ## Published repository
 
 The charts are published automatically to GitHub Pages:

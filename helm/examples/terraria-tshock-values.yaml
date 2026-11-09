@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  repository: trfc/terraria
+  tag: "4.5.12"
+  pullPolicy: IfNotPresent
+
+args:
+  - -autocreate
+  - "1"
+  - -world
+  - /world/Terrarium.wld
+
+containerPorts:
+  - name: terraria-tcp
+    containerPort: 7777
+    protocol: TCP
+  - name: terraria-udp
+    containerPort: 7777
+    protocol: UDP
+
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    - name: terraria-tcp
+      port: 7777
+      targetPort: terraria-tcp
+      protocol: TCP
+    - name: terraria-udp
+      port: 7777
+      targetPort: terraria-udp
+      protocol: UDP
+
+persistence:
+  enabled: true
+  size: 5Gi
+  mounts:
+    - mountPath: /world
+
+startupProbe:
+  tcpSocket:
+    port: terraria-tcp
+  periodSeconds: 10
+  failureThreshold: 30
+
+readinessProbe:
+  tcpSocket:
+    port: terraria-tcp
+  periodSeconds: 10
+  failureThreshold: 6

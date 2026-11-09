@@ -32,6 +32,7 @@ service:
   port: 80
   targetPort: http
   protocol: TCP
+  ports: []
 
 containerPorts:
   - name: http
@@ -40,6 +41,7 @@ containerPorts:
 
 stdin: false
 tty: false
+args: []
 
 resources: {}
 

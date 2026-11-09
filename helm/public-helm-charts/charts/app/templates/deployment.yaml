@@ -46,6 +46,10 @@ spec:
           {{- end }}
           stdin: {{ .Values.stdin }}
           tty: {{ .Values.tty }}
+          {{- with .Values.args }}
+          args:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           ports:
             {{- range .Values.containerPorts }}
             - name: {{ .name }}

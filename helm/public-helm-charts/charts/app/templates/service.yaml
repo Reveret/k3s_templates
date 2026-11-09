@@ -14,8 +14,12 @@ spec:
   selector:
     {{- include "app.selectorLabels" . | nindent 4 }}
   ports:
+    {{- if .Values.service.ports }}
+    {{- toYaml .Values.service.ports | nindent 4 }}
+    {{- else }}
     - name: {{ .Values.service.portName }}
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
       protocol: {{ .Values.service.protocol }}
+    {{- end }}
 {{- end }}
